@@ -13,3 +13,6 @@ __pycache__/
 .yarn-cache/
 *.pyc
 *.pyo
+
+# 运行时状态数据
+data/
