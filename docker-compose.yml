@@ -1,0 +1,34 @@
+services:
+  app:
+    build: .
+    image: rotation-authority:latest
+    container_name: rotation-authority-app
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      DATA_FILE: /data/state.json
+    volumes:
+      - rotation-data:/data
+    restart: unless-stopped
+    healthcheck:
+      # 健康响应反映设备域状态（域数量、活动检查点、待签候选）。
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 2s
+
+  # 验收入口：docker compose build verify && docker compose run --rm verify
+  # 依次运行轮换规则代码测试、构建检查、HTTP 冒烟，结束后退出并以退出码报告结果。
+  verify:
+    build: .
+    image: rotation-authority:latest
+    container_name: rotation-authority-verify
+    command: ["./verify"]
+    environment:
+      DATA_FILE: /tmp/verify/state.json
+    restart: "no"
+
+volumes:
+  rotation-data:

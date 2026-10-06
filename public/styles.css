@@ -1,0 +1,147 @@
+:root {
+  --bg: #0f1720;
+  --panel: #16212e;
+  --panel-2: #1c2a3a;
+  --border: #2b3d52;
+  --text: #dce6f1;
+  --muted: #8fa3b8;
+  --accent: #4ea1ff;
+  --ok: #3ddc97;
+  --warn: #ffb454;
+  --bad: #ff6b6b;
+  --pending: #ffd166;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.5;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.topbar h1 { font-size: 18px; margin: 0; }
+.health {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+.health.ok { color: var(--ok); }
+.health.bad { color: var(--bad); }
+
+.layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(360px, 1fr) 1.4fr;
+  padding: 16px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.card.wide { grid-column: 1 / -1; }
+.card h2 { font-size: 16px; margin: 0 0 10px; }
+.card h3 { font-size: 14px; margin: 16px 0 6px; color: var(--accent); }
+.card h4 { font-size: 13px; margin: 14px 0 6px; color: var(--muted); }
+.hint { color: var(--muted); font-size: 12.5px; margin: 6px 0; }
+
+label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0; }
+input, select, textarea {
+  width: 100%;
+  margin-top: 4px;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+textarea { resize: vertical; }
+.row { display: flex; gap: 8px; align-items: flex-end; margin-top: 8px; flex-wrap: wrap; }
+.row.wrap { flex-wrap: wrap; }
+.grow { flex: 1; min-width: 180px; }
+button {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+button.primary:hover { background: #388bfd; }
+.hidden { display: none !important; }
+
+.result {
+  background: #0b121b;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 320px;
+  overflow: auto;
+  margin-top: 10px;
+}
+.mono { font-family: var(--mono); font-size: 12.5px; word-break: break-all; }
+dl.grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 4px 12px;
+  margin: 6px 0;
+}
+dl.grid dt { color: var(--muted); font-size: 12.5px; }
+dl.grid dd { margin: 0; }
+
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: var(--mono);
+}
+.badge.pending { background: rgba(255,209,102,.15); color: var(--pending); }
+.badge.activated { background: rgba(61,220,151,.15); color: var(--ok); }
+.badge.rejected { background: rgba(255,107,107,.15); color: var(--bad); }
+.badge.head { background: rgba(78,161,255,.18); color: var(--accent); }
+
+table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+th, td {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12.5px;
+  vertical-align: top;
+}
+th { color: var(--muted); font-weight: 600; }
+
+.checkpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  background: var(--panel-2);
+}
+.checkpoint .line { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.checkpoint dl.grid { grid-template-columns: 130px 1fr; }
+.evidence { color: var(--ok); }
+.reason { color: var(--bad); }
+.dup { color: var(--warn); }

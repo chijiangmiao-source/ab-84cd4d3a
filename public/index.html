@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>隔离维护网 · 设备域密钥轮换授权链</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>设备域密钥轮换授权链</h1>
+    <div class="health" id="health">健康检查中…</div>
+  </header>
+
+  <main class="layout">
+    <!-- 左栏：创建设备域 -->
+    <section class="card">
+      <h2>1 · 创建设备域</h2>
+      <p class="hint">设备域包含 <strong>2–5 把 Ed25519 公钥</strong>及门限（1..N）。公钥使用 JWK（OKP/Ed25519）。</p>
+      <label>设备域名称 <input id="domainName" type="text" value="远端设备域 A" /></label>
+      <div class="row">
+        <label class="grow">初始门限
+          <input id="domainThreshold" type="number" min="1" max="5" value="2" />
+        </label>
+        <button type="button" id="genKeysBtn">生成演示密钥对</button>
+      </div>
+      <p class="hint" id="genStatus">若浏览器支持 Ed25519 WebCrypto，可一键生成并保管私钥用于页面签名；否则可手工粘贴公钥 JWK。</p>
+      <div id="keyEditors"></div>
+      <div class="row">
+        <button type="button" id="addKeyBtn">+ 增加一把公钥</button>
+        <button type="button" id="removeKeyBtn">− 移除末把</button>
+        <button type="button" class="primary" id="createDomainBtn">创建设备域</button>
+      </div>
+      <pre id="createResult" class="result"></pre>
+    </section>
+
+    <!-- 中栏：设备域与轮换 -->
+    <section class="card wide">
+      <h2>2 · 选择设备域并发起轮换</h2>
+      <div class="row">
+        <button type="button" id="refreshListBtn">刷新设备域列表</button>
+        <select id="domainSelect" class="grow"></select>
+        <button type="button" id="loadDomainBtn">读取状态</button>
+      </div>
+
+      <div id="domainDetail" class="hidden">
+        <h3>当前活动链头</h3>
+        <dl class="grid">
+          <dt>链头摘要</dt><dd id="headDigest" class="mono"></dd>
+          <dt>当前代次</dt><dd id="headEpoch"></dd>
+          <dt>当前门限</dt><dd id="headThreshold"></dd>
+          <dt>排序后公钥集</dt><dd id="headKeys" class="mono"></dd>
+        </dl>
+
+        <h3>发起轮换候选（固定载荷）</h3>
+        <label>轮换标识 rotationId <input id="rotationId" type="text" value="rot-2026-10-06-01" /></label>
+        <div class="row">
+          <label class="grow">新门限 <input id="nextThreshold" type="number" min="1" max="5" value="2" /></label>
+          <button type="button" id="useHeadKeysBtn">以链头公钥预填新公钥集</button>
+        </div>
+        <div id="nextKeyEditors"></div>
+        <div class="row">
+          <button type="button" id="addNextKeyBtn">+ 增加新公钥</button>
+          <button type="button" id="removeNextKeyBtn">− 移除末把</button>
+          <button type="button" class="primary" id="fixProposalBtn">固定候选并生成规范消息</button>
+        </div>
+
+        <div id="proposalPanel" class="hidden proposal">
+          <h4>待签候选（规范 UTF-8 消息）</h4>
+          <dl class="grid">
+            <dt>固定父摘要</dt><dd id="pParentDigest" class="mono"></dd>
+            <dt>下一代次</dt><dd id="pEpoch"></dd>
+            <dt>排序后新公钥集</dt><dd id="pNextKeys" class="mono"></dd>
+            <dt>新门限</dt><dd id="pNextThreshold"></dd>
+          </dl>
+          <pre id="pMessage" class="result mono"></pre>
+
+          <h4>分批提交签名</h4>
+          <p class="hint">同一轮换标识可分多批提交；每批选择一名父成员并提交其 Ed25519 签名。去重计数达到父门限后候选激活。</p>
+          <div class="row wrap">
+            <label class="grow">签名者（父成员私钥，浏览器签名）
+              <select id="signerSelect"></select>
+            </label>
+            <button type="button" id="browserSignBtn">浏览器内签名</button>
+          </div>
+          <label>或手工粘贴签名者公钥 JWK
+            <textarea id="manualSigner" rows="2" placeholder='{"kty":"OKP","crv":"Ed25519","x":"…"}'></textarea>
+          </label>
+          <label>签名（base64url，对上方规范 UTF-8 消息）
+            <textarea id="manualSignature" rows="2"></textarea>
+          </label>
+          <div class="row">
+            <button type="button" class="primary" id="submitBatchBtn">提交本批签名</button>
+            <button type="button" id="resubmitBtn">重传上一批（幂等验证）</button>
+          </div>
+          <pre id="submitResult" class="result"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右栏：检查点与拒因 -->
+    <section class="card wide">
+      <h2>3 · 检查点 · 待签 · 已拒</h2>
+      <div id="statePanel">
+        <p class="hint">读取设备域后在此展示。</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
